@@ -1,9 +1,11 @@
 package net.thedragonskull.qtefishingmod.mixin;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
@@ -97,11 +99,15 @@ public class FishingHookMixin implements IFishingHookQte {
                     qte.setQteHandled(true);
                     hook.retrieve(player.getMainHandItem());  // TODO: ambas manos y restar durability?
                     player.displayClientMessage(Component.literal("¡Fallaste el QTE por no reaccionar a tiempo!"), false);
+                    mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO.get(), 1.0F, 1.5F));
+                    mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.FISH_SWIM, 1.0F, 1.5F));
                     PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
                 }
             }
         }
     }
+
+    //todo ordenar y optimizar, preguntar si es necesario o si se puede hacer en otro sitio
 
     @Override
     public int getQteSuccessCount() {
@@ -132,13 +138,13 @@ public class FishingHookMixin implements IFishingHookQte {
     private int qteSuccessCount = 0;
 
     @Unique
-    private final int MAX_QTE_SUCCESS = 4;
+    private final int MAX_QTE_SUCCESS = 4; //todo CONFIG
 
     @Unique
     private long qteStartTime = 0L;
 
     @Unique
-    private final long QTE_TIMEOUT_TICKS = 200L; //todo cambiar
+    private final long QTE_TIMEOUT_TICKS = 30L; //todo CONFIG
 
     @Unique
     private boolean qteHandled = false;
@@ -184,6 +190,13 @@ public class FishingHookMixin implements IFishingHookQte {
         this.expectedKey = null;
         this.qteLoot = ItemStack.EMPTY;
         this.qtePlayer = null;
+    }
+
+    @Override
+    public void refreshQteTimer() {
+        if (this.qtePlayer != null) {
+            this.qteStartTime = this.qtePlayer.serverLevel().getGameTime();
+        }
     }
 
     @Override

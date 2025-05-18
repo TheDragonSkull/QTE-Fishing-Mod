@@ -14,9 +14,6 @@ public class QteManager {
     private static final String VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final Random RANDOM = new Random();
 
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
-
-
     public static String getRandomQteChar() {
         int index = RANDOM.nextInt(VALID_CHARS.length());
         return String.valueOf(VALID_CHARS.charAt(index));

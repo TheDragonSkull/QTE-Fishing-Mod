@@ -32,10 +32,7 @@ public class QteScreen extends Screen {
         String keyString = InputConstants.getKey(keyCode, scanCode).getDisplayName().getString();
 
         if (keyString.matches("^[A-Z0-9]$")) {
-            if (keyString.equalsIgnoreCase(currentKey)) {
-                PacketHandler.sendToServer(new C2SQTEPacket(keyString));
-            }
-
+            PacketHandler.sendToServer(new C2SQTEPacket(keyString));
             return true;
         }
 

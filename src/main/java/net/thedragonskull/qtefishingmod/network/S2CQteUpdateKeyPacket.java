@@ -30,7 +30,6 @@ public class S2CQteUpdateKeyPacket {
 
             if (minecraft.screen instanceof QteScreen screen) {
                 screen.setCurrentKey(this.key);
-
                 minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_PLING.get(), 1.0F, 1.5F));
             }
 

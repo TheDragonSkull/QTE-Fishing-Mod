@@ -1,9 +1,12 @@
 package net.thedragonskull.qtefishingmod.network;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -34,6 +37,7 @@ public class C2SQTEPacket {
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
+            Minecraft minecraft = Minecraft.getInstance();
             ServerPlayer player = context.getSender();
             if (player != null && player.fishing instanceof FishingHook) {
                 FishingHook hook = player.fishing;
@@ -65,16 +69,14 @@ public class C2SQTEPacket {
                             hook.retrieve(player.getMainHandItem());
                             qte.cancelQte();
                             PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
+
                         } else {
-                            System.out.println("this key: " + this.key);
-                            System.out.println("expected: " + qte.getExpectedKey());
+
                             //Next QTE
                             String nextKey = QteManager.getRandomQteChar();
                             qte.setExpectedKey(nextKey);
+                            qte.refreshQteTimer();
                             PacketHandler.sendToPlayer(new S2CQteUpdateKeyPacket(nextKey), player);
-                            System.out.println("this key: " + this.key);
-                            System.out.println("expected: " + qte.getExpectedKey());
-                            System.out.println("next: " + nextKey);
                         }
                     } else {
 
@@ -84,6 +86,8 @@ public class C2SQTEPacket {
                         hook.retrieve(player.getMainHandItem());
                         qte.cancelQte();
                         PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
+                        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO.get(), 1.0F, 1.5F));
+                        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.FISH_SWIM, 1.0F, 1.5F));
                     }
                 }
             }

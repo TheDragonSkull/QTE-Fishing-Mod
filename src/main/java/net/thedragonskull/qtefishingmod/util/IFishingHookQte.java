@@ -25,5 +25,7 @@ public interface IFishingHookQte {
     ItemStack getQteLoot();
 
     void setExpectedKey(String key);
+
+    void refreshQteTimer();
 }
 
