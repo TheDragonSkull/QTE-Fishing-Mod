@@ -16,11 +16,15 @@ public class QteScreen extends Screen {
 
     private static final ResourceLocation BASE = new ResourceLocation(QteFishingMod.MOD_ID, "textures/gui/qte_bg.png");
 
-    private final String expectedKey;
+    private String currentKey;
 
-    public QteScreen(String expectedKey) {
+    public QteScreen(String initialKey) {
         super(Component.empty());
-        this.expectedKey = expectedKey;
+        this.currentKey = initialKey;
+    }
+
+    public void setCurrentKey(String key) {
+        this.currentKey = key;
     }
 
     @Override
@@ -28,11 +32,10 @@ public class QteScreen extends Screen {
         String keyString = InputConstants.getKey(keyCode, scanCode).getDisplayName().getString();
 
         if (keyString.matches("^[A-Z0-9]$")) {
-            if (keyString.equalsIgnoreCase(expectedKey)) {
+            if (keyString.equalsIgnoreCase(currentKey)) {
                 PacketHandler.sendToServer(new C2SQTEPacket(keyString));
             }
 
-            onClose();
             return true;
         }
 
@@ -63,13 +66,13 @@ public class QteScreen extends Screen {
         guiGraphics.pose().pushPose();
 
         float scale = 4.0f;
-        int textWidth = this.font.width(expectedKey);
+        int textWidth = this.font.width(currentKey);
         int textHeight = this.font.lineHeight;
 
         guiGraphics.pose().scale(scale, scale, 1.0f);
         guiGraphics.pose().translate(((float) midWidth / 4) - ((float) textWidth / 2.25), ((float) midHeight / 4) - ((float) textHeight / 2.5), 0);
 
-        guiGraphics.drawString(this.font, expectedKey, 0, 0, 0xFFFFFF, false);
+        guiGraphics.drawString(this.font, currentKey, 0, 0, 0xFFFFFF, false);
 
         guiGraphics.pose().popPose();
 

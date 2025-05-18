@@ -9,12 +9,15 @@ import net.minecraftforge.fml.common.Mod;
 import net.thedragonskull.qtefishingmod.QteFishingMod;
 import net.thedragonskull.qtefishingmod.network.C2SQTEPacket;
 import net.thedragonskull.qtefishingmod.network.PacketHandler;
+import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = QteFishingMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientForgeEvents {
 
     @SubscribeEvent
     public static void onInputEvent(InputEvent.Key event) {
+        if (event.getAction() != GLFW.GLFW_PRESS) return;
+
         int keyCode = event.getKey();
         String keyString = InputConstants.getKey(keyCode, 0).getDisplayName().getString();
 

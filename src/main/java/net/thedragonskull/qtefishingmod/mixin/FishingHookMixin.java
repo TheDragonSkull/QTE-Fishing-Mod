@@ -15,7 +15,8 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.thedragonskull.qtefishingmod.network.PacketHandler;
 import net.thedragonskull.qtefishingmod.network.S2CQTEScreenClosePacket;
 import net.thedragonskull.qtefishingmod.network.S2CQTEStartPacket;
-import net.thedragonskull.qtefishingmod.util.FishingHookQteData;
+import net.thedragonskull.qtefishingmod.util.IFishingHookQte;
+import net.thedragonskull.qtefishingmod.util.QteManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.Random;
 
 @Mixin(FishingHook.class)
-public class FishingHookMixin implements FishingHookQteData {
+public class FishingHookMixin implements IFishingHookQte {
 
     @Unique
     private static final String VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -37,7 +38,7 @@ public class FishingHookMixin implements FishingHookQteData {
     @Inject(method = "retrieve", at = @At("HEAD"), cancellable = true)
     private void cancelIfQteActive(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
         FishingHook hook = (FishingHook)(Object)this;
-        FishingHookQteData qte = (FishingHookQteData) hook;
+        IFishingHookQte qte = (IFishingHookQte) hook;
 
         if (qte.isQteActive()) {
             qte.cancelQte(); // Cancelamos el QTE
@@ -47,7 +48,7 @@ public class FishingHookMixin implements FishingHookQteData {
         }
 
         // Si el QTE ya fue procesado (acertado o fallado), no dar loot vanilla
-        if (qte.wasQteHandled()) {
+        if (qte.isQteHandled()) {
             hook.discard(); // Eliminar anzuelo normalmente
             cir.setReturnValue(0); // Cancelar loot vanilla
         }
@@ -60,7 +61,7 @@ public class FishingHookMixin implements FishingHookQteData {
 
         if (!hook.level().isClientSide()) {
             int nibble = ((FishingHookAccessor) hook).getNibble();
-            FishingHookQteData qte = (FishingHookQteData) hook;
+            IFishingHookQte qte = (IFishingHookQte) hook;
 
             if (nibble > 0) {
                 if (!qte.isQteActive()) {
@@ -82,7 +83,7 @@ public class FishingHookMixin implements FishingHookQteData {
                         ItemStack firstLoot = loot.isEmpty() ? ItemStack.EMPTY : loot.get(0);
 
                         // Iniciar QTE con letra random
-                        String randomChar = getRandomQteChar();
+                        String randomChar = QteManager.getRandomQteChar();
                         qte.startQte(player, randomChar, firstLoot);
                         PacketHandler.sendToPlayer(new S2CQTEStartPacket(randomChar), player);
                     }
@@ -102,10 +103,36 @@ public class FishingHookMixin implements FishingHookQteData {
         }
     }
 
-    private static String getRandomQteChar() {
-        int index = RANDOM.nextInt(VALID_CHARS.length());
-        return String.valueOf(VALID_CHARS.charAt(index));
+    @Override
+    public int getQteSuccessCount() {
+        return this.qteSuccessCount;
     }
+
+    @Override
+    public void incrementQteSuccessCount() {
+        this.qteSuccessCount++;
+    }
+
+    @Override
+    public int getMaxQteSuccess() {
+        return this.MAX_QTE_SUCCESS;
+    }
+
+    @Override
+    public String getExpectedKey() {
+        return expectedKey;
+    }
+
+    @Override
+    public void setExpectedKey(String key) {
+        this.expectedKey = key;
+    }
+
+    @Unique
+    private int qteSuccessCount = 0;
+
+    @Unique
+    private final int MAX_QTE_SUCCESS = 4;
 
     @Unique
     private long qteStartTime = 0L;
@@ -117,7 +144,7 @@ public class FishingHookMixin implements FishingHookQteData {
     private boolean qteHandled = false;
 
     @Override
-    public boolean wasQteHandled() {
+    public boolean isQteHandled() {
         return qteHandled;
     }
 
@@ -141,10 +168,14 @@ public class FishingHookMixin implements FishingHookQteData {
     @Override
     public void startQte(ServerPlayer player, String key, ItemStack loot) {
         this.qtePlayer = player;
-        this.expectedKey = key;
         this.qteLoot = loot;
-        this.qteActive = true;
         this.qteStartTime = player.serverLevel().getGameTime();
+        this.expectedKey = key;
+
+        if (!this.qteActive) {
+            this.qteActive = true;
+            this.qteSuccessCount = 0;
+        }
     }
 
     @Override
@@ -161,17 +192,8 @@ public class FishingHookMixin implements FishingHookQteData {
     }
 
     @Override
-    public String getExpectedKey() {
-        return expectedKey;
-    }
-
-    @Override
     public ItemStack getQteLoot() {
         return qteLoot;
     }
 
-    @Override
-    public ServerPlayer getQtePlayer() {
-        return qtePlayer;
-    }
 }

@@ -37,6 +37,12 @@ public class PacketHandler {
                 .decoder(S2CQTEScreenClosePacket::new)
                 .consumerMainThread(S2CQTEScreenClosePacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(S2CQteUpdateKeyPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CQteUpdateKeyPacket::encode)
+                .decoder(S2CQteUpdateKeyPacket::new)
+                .consumerMainThread(S2CQteUpdateKeyPacket::handle)
+                .add();
     }
 
 

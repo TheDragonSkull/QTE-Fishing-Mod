@@ -11,7 +11,8 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
-import net.thedragonskull.qtefishingmod.util.FishingHookQteData;
+import net.thedragonskull.qtefishingmod.util.IFishingHookQte;
+import net.thedragonskull.qtefishingmod.util.QteManager;
 
 import java.util.function.Supplier;
 
@@ -36,36 +37,54 @@ public class C2SQTEPacket {
             ServerPlayer player = context.getSender();
             if (player != null && player.fishing instanceof FishingHook) {
                 FishingHook hook = player.fishing;
-                FishingHookQteData qte = (FishingHookQteData) hook;
+                IFishingHookQte qte = (IFishingHookQte) hook;
                 if (qte.isQteActive()) {
                     if (qte.getExpectedKey().equalsIgnoreCase(this.key)) {
-                        player.displayClientMessage(Component.literal("¡QTE superado! Has pescado: " + qte.getQteLoot().getDisplayName().getString()), false);
+                        qte.incrementQteSuccessCount();
 
-                        ServerLevel level = player.serverLevel();
-                        ItemStack loot = qte.getQteLoot();
-                        ItemEntity itemEntity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), loot.copy());
+                        if (qte.getQteSuccessCount() >= qte.getMaxQteSuccess()) {
 
-                        double dx = player.getX() - hook.getX();
-                        double dy = player.getY() - hook.getY();
-                        double dz = player.getZ() - hook.getZ();
-                        itemEntity.setDeltaMovement(dx * 0.1D, dy * 0.1D + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08D, dz * 0.1D);
+                            //Finish
+                            ServerLevel level = player.serverLevel();
+                            ItemStack loot = qte.getQteLoot();
+                            ItemEntity itemEntity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), loot.copy());
 
-                        level.addFreshEntity(itemEntity);
-                        level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, level.random.nextInt(6) + 1));
+                            double dx = player.getX() - hook.getX();
+                            double dy = player.getY() - hook.getY();
+                            double dz = player.getZ() - hook.getZ();
+                            itemEntity.setDeltaMovement(dx * 0.1D, dy * 0.1D + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08D, dz * 0.1D);
 
-                        if (loot.is(ItemTags.FISHES)) {
-                            player.awardStat(Stats.FISH_CAUGHT, 1);
+                            level.addFreshEntity(itemEntity);
+                            level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, level.random.nextInt(6) + 1));
+
+                            if (loot.is(ItemTags.FISHES)) {
+                                player.awardStat(Stats.FISH_CAUGHT, 1);
+                            }
+
+                            qte.setQteHandled(true);
+                            hook.retrieve(player.getMainHandItem());
+                            qte.cancelQte();
+                            PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
+                        } else {
+                            System.out.println("this key: " + this.key);
+                            System.out.println("expected: " + qte.getExpectedKey());
+                            //Next QTE
+                            String nextKey = QteManager.getRandomQteChar();
+                            qte.setExpectedKey(nextKey);
+                            PacketHandler.sendToPlayer(new S2CQteUpdateKeyPacket(nextKey), player);
+                            System.out.println("this key: " + this.key);
+                            System.out.println("expected: " + qte.getExpectedKey());
+                            System.out.println("next: " + nextKey);
                         }
-
-                        qte.setQteHandled(true);
-
                     } else {
-                        player.displayClientMessage(Component.literal("¡Fallaste el QTE! Has perdido el pez."), false);
-                    }
 
-                    qte.setQteHandled(true);
-                    hook.retrieve(player.getMainHandItem()); // TODO: ambas manos
-                    qte.cancelQte(); // IMPORTANTE: solo se puede hacer una vez
+                        //Fail
+                        player.displayClientMessage(Component.literal("¡Fallaste el QTE! Has perdido el pez."), false);
+                        qte.setQteHandled(true);
+                        hook.retrieve(player.getMainHandItem());
+                        qte.cancelQte();
+                        PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
+                    }
                 }
             }
         });
