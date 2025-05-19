@@ -36,7 +36,6 @@ public class C2SQTEPacket {
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            Minecraft minecraft = Minecraft.getInstance();
             ServerPlayer player = context.getSender();
             if (player != null && player.fishing instanceof FishingHook) {
                 FishingHook hook = player.fishing;
@@ -84,10 +83,9 @@ public class C2SQTEPacket {
                         QteManager.retrieveAndDamageRod(player, hook, 1);
                         qte.cancelQte();
                         PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
-                        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO.get(), 1.0F, 1.5F));
+                        PacketHandler.sendToPlayer(new S2CPlayFailSoundPacket(), player);
                         player.level().playSound(null, hook.getX(), hook.getY(), hook.getZ(),
                                 SoundEvents.FISH_SWIM, player.getSoundSource(), 1.0F, 1.5F);
-                        //player.displayClientMessage(Component.literal("¡QTE Failed! Fish lost."), false);
                     }
                 }
             }
