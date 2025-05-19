@@ -1,5 +1,8 @@
 ![qte_fishing_mod_banner](https://github.com/user-attachments/assets/8e67207f-840b-419e-86d8-e97194b07e9f)
 
+[![CurseForge Versions](https://cf.way2muchnoise.eu/versions/1269089.svg)](https://www.curseforge.com/minecraft/mc-mods/thedragons-mini-qte-fishing)
+[![CurseForge Downloads](https://cf.way2muchnoise.eu/short_1269089_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/thedragons-mini-qte-fishing)  
+
 ---
 
 📖 About:
