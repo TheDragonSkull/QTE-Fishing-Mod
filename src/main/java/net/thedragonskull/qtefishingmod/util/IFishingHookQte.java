@@ -27,5 +27,7 @@ public interface IFishingHookQte {
     void setExpectedKey(String key);
 
     void refreshQteTimer();
+
+    long getQteStartTime();
 }
 

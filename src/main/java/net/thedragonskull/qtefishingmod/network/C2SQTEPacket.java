@@ -3,7 +3,6 @@ package net.thedragonskull.qtefishingmod.network;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -66,7 +65,7 @@ public class C2SQTEPacket {
                             }
 
                             qte.setQteHandled(true);
-                            hook.retrieve(player.getMainHandItem());
+                            QteManager.retrieveAndDamageRod(player, hook, 2);
                             qte.cancelQte();
                             PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
 
@@ -81,13 +80,14 @@ public class C2SQTEPacket {
                     } else {
 
                         //Fail
-                        player.displayClientMessage(Component.literal("¡Fallaste el QTE! Has perdido el pez."), false);
                         qte.setQteHandled(true);
-                        hook.retrieve(player.getMainHandItem());
+                        QteManager.retrieveAndDamageRod(player, hook, 1);
                         qte.cancelQte();
                         PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
                         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO.get(), 1.0F, 1.5F));
-                        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.FISH_SWIM, 1.0F, 1.5F));
+                        player.level().playSound(null, hook.getX(), hook.getY(), hook.getZ(),
+                                SoundEvents.FISH_SWIM, player.getSoundSource(), 1.0F, 1.5F);
+                        //player.displayClientMessage(Component.literal("¡QTE Failed! Fish lost."), false);
                     }
                 }
             }

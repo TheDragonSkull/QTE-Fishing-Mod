@@ -34,6 +34,13 @@ public class FishingHookMixin implements IFishingHookQte {
 
     @Unique
     private static final String VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    @Unique
+    private final int MAX_QTE_SUCCESS = 4; //todo CONFIG
+
+    @Unique
+    private final long QTE_TIMEOUT_TICKS = 30L; //todo CONFIG
+
     @Unique
     private static final Random RANDOM = new Random();
 
@@ -43,20 +50,19 @@ public class FishingHookMixin implements IFishingHookQte {
         IFishingHookQte qte = (IFishingHookQte) hook;
 
         if (qte.isQteActive()) {
-            qte.cancelQte(); // Cancelamos el QTE
-            hook.discard();  // Recogemos el anzuelo
-            cir.setReturnValue(0); // Sin loot
+            qte.cancelQte();
+            hook.discard();
+            cir.setReturnValue(0);
             return;
         }
 
-        // Si el QTE ya fue procesado (acertado o fallado), no dar loot vanilla
         if (qte.isQteHandled()) {
-            hook.discard(); // Eliminar anzuelo normalmente
-            cir.setReturnValue(0); // Cancelar loot vanilla
+            hook.discard();
+            cir.setReturnValue(0);
         }
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))  //TODO: solo teclado americano y números 0-9
+    @Inject(method = "tick", at = @At("TAIL"))
     private void onTick(CallbackInfo ci) {
         FishingHook hook = (FishingHook)(Object)this;
         Minecraft mc = Minecraft.getInstance();
@@ -70,21 +76,10 @@ public class FishingHookMixin implements IFishingHookQte {
                     Entity owner = hook.getOwner();
                     if (owner instanceof ServerPlayer player && hook.level() instanceof ServerLevel serverLevel) {
 
-                        // Generar loot
-                        LootParams lootparams = new LootParams.Builder(serverLevel)
-                                .withParameter(LootContextParams.ORIGIN, hook.position())
-                                .withParameter(LootContextParams.TOOL, player.getMainHandItem())  // TODO: ambas manos
-                                .withParameter(LootContextParams.THIS_ENTITY, hook)
-                                .withParameter(LootContextParams.KILLER_ENTITY, owner)
-                                .withLuck((float)((FishingHookAccessor)hook).getLuck() + player.getLuck())
-                                .create(LootContextParamSets.FISHING);
+                        // Generate loot
+                        ItemStack firstLoot = QteManager.generateFishingLoot(player, hook);
 
-                        LootTable loottable = serverLevel.getServer().getLootData().getLootTable(BuiltInLootTables.FISHING);
-                        List<ItemStack> loot = loottable.getRandomItems(lootparams);
-
-                        ItemStack firstLoot = loot.isEmpty() ? ItemStack.EMPTY : loot.get(0);
-
-                        // Iniciar QTE con letra random
+                        // Start Qte
                         String randomChar = QteManager.getRandomQteChar();
                         qte.startQte(player, randomChar, firstLoot);
                         PacketHandler.sendToPlayer(new S2CQTEStartPacket(randomChar), player);
@@ -92,22 +87,17 @@ public class FishingHookMixin implements IFishingHookQte {
                 }
             }
 
-            if (qte.isQteActive() && hook.getOwner() instanceof ServerPlayer player && hook.level() instanceof ServerLevel level) {
-                long elapsed = level.getGameTime() - this.qteStartTime;
-                if (elapsed >= QTE_TIMEOUT_TICKS) {
-                    qte.cancelQte();
-                    qte.setQteHandled(true);
-                    hook.retrieve(player.getMainHandItem());  // TODO: ambas manos y restar durability?
-                    player.displayClientMessage(Component.literal("¡Fallaste el QTE por no reaccionar a tiempo!"), false);
-                    mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO.get(), 1.0F, 1.5F));
-                    mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.FISH_SWIM, 1.0F, 1.5F));
-                    PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
-                }
-            }
+            QteManager.handleQteTimeout(hook, qte);
         }
     }
 
-    //todo ordenar y optimizar, preguntar si es necesario o si se puede hacer en otro sitio
+    @Unique private boolean qteActive = false;
+    @Unique private boolean qteHandled = false;
+    @Unique private int qteSuccessCount = 0;
+    @Unique private String expectedKey;
+    @Unique private ItemStack qteLoot = ItemStack.EMPTY;
+    @Unique private ServerPlayer qtePlayer;
+    @Unique private long qteStartTime = 0L;
 
     @Override
     public int getQteSuccessCount() {
@@ -134,20 +124,10 @@ public class FishingHookMixin implements IFishingHookQte {
         this.expectedKey = key;
     }
 
-    @Unique
-    private int qteSuccessCount = 0;
-
-    @Unique
-    private final int MAX_QTE_SUCCESS = 4; //todo CONFIG
-
-    @Unique
-    private long qteStartTime = 0L;
-
-    @Unique
-    private final long QTE_TIMEOUT_TICKS = 30L; //todo CONFIG
-
-    @Unique
-    private boolean qteHandled = false;
+    @Override
+    public long getQteStartTime() {
+        return qteStartTime;
+    }
 
     @Override
     public boolean isQteHandled() {
@@ -158,18 +138,6 @@ public class FishingHookMixin implements IFishingHookQte {
     public void setQteHandled(boolean handled) {
         this.qteHandled = handled;
     }
-
-    @Unique
-    private boolean qteActive = false;
-
-    @Unique
-    private String expectedKey;
-
-    @Unique
-    private ItemStack qteLoot = ItemStack.EMPTY;
-
-    @Unique
-    private ServerPlayer qtePlayer;
 
     @Override
     public void startQte(ServerPlayer player, String key, ItemStack loot) {

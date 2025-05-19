@@ -43,6 +43,12 @@ public class PacketHandler {
                 .decoder(S2CQteUpdateKeyPacket::new)
                 .consumerMainThread(S2CQteUpdateKeyPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(S2CPlayFailSoundPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CPlayFailSoundPacket::encode)
+                .decoder(S2CPlayFailSoundPacket::new)
+                .consumerMainThread(S2CPlayFailSoundPacket::handle)
+                .add();
     }
 
 
