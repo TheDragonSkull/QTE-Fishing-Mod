@@ -13,7 +13,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.thedragonskull.qtefishingmod.config.QteConfig;
+import net.thedragonskull.qtefishingmod.config.QteCommonConfigs;
 import net.thedragonskull.qtefishingmod.mixin.FishingHookAccessor;
 import net.thedragonskull.qtefishingmod.network.PacketHandler;
 import net.thedragonskull.qtefishingmod.network.S2CPlayFailSoundPacket;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 public class QteManager {
-    private static final String VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final String VALID_CHARS = QteCommonConfigs.VALID_CHARS.get();
     private static final Random RANDOM = new Random();
 
     public static String getRandomQteChar() {
@@ -73,7 +73,7 @@ public class QteManager {
         if (!(hook.getOwner() instanceof ServerPlayer player) || !(hook.level() instanceof ServerLevel level)) return;
 
         long elapsed = level.getGameTime() - qte.getQteStartTime();
-        if (elapsed >= QteConfig.QTE_TIMEOUT_TICKS) {
+        if (elapsed >= QteCommonConfigs.QTE_TIMEOUT_TICKS.get()) {
             qte.cancelQte();
             qte.setQteHandled(true);
             retrieveAndDamageRod(player, hook, 1);

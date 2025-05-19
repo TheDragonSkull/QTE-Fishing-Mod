@@ -14,6 +14,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.thedragonskull.qtefishingmod.config.QteCommonConfigs;
 import net.thedragonskull.qtefishingmod.network.PacketHandler;
 import net.thedragonskull.qtefishingmod.network.S2CQTEScreenClosePacket;
 import net.thedragonskull.qtefishingmod.network.S2CQTEStartPacket;
@@ -31,15 +32,6 @@ import java.util.Random;
 
 @Mixin(FishingHook.class)
 public class FishingHookMixin implements IFishingHookQte {
-
-    @Unique
-    private static final String VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    @Unique
-    private final int MAX_QTE_SUCCESS = 4; //todo CONFIG
-
-    @Unique
-    private final long QTE_TIMEOUT_TICKS = 30L; //todo CONFIG
 
     @Unique
     private static final Random RANDOM = new Random();
@@ -111,7 +103,7 @@ public class FishingHookMixin implements IFishingHookQte {
 
     @Override
     public int getMaxQteSuccess() {
-        return this.MAX_QTE_SUCCESS;
+        return QteCommonConfigs.MAX_QTE_SUCCESS.get();
     }
 
     @Override
