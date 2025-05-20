@@ -29,5 +29,18 @@ public interface IFishingHookQte {
     void refreshQteTimer();
 
     long getQteStartTime();
+
+    // words
+
+    String getExpectedWord();
+
+    void setExpectedWord(String word);
+
+    int getCurrentWordIndex();
+
+    void setCurrentWordIndex(int index);
+
+    void incrementCurrentWordIndex();
+
 }
 

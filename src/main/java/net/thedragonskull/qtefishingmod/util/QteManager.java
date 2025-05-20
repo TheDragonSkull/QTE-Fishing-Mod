@@ -24,11 +24,17 @@ import java.util.Random;
 
 public class QteManager {
     private static final String VALID_CHARS = QteCommonConfigs.VALID_CHARS.get();
+    private static final List<String> WORDS = List.of("fish", "hook", "net", "river", "bait", "catch"); //todo config
+
     private static final Random RANDOM = new Random();
 
     public static String getRandomQteChar() {
         int index = RANDOM.nextInt(VALID_CHARS.length());
         return String.valueOf(VALID_CHARS.charAt(index));
+    }
+
+    public static String getRandomQteWord() {
+        return WORDS.get(RANDOM.nextInt(WORDS.size())).toUpperCase();
     }
 
     public static void retrieveAndDamageRod(ServerPlayer player, FishingHook hook, int damage) {
@@ -84,7 +90,8 @@ public class QteManager {
         }
     }
 
-
-
+    public static boolean isHardModeEnabled() {
+        return QteCommonConfigs.HARD_MODE.get();
+    }
 }
 

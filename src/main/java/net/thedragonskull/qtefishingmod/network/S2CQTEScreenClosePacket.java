@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import net.thedragonskull.qtefishingmod.screen.QteScreen;
+import net.thedragonskull.qtefishingmod.screen.QteWordScreen;
 
 import java.util.function.Supplier;
 
@@ -22,7 +23,7 @@ public class S2CQTEScreenClosePacket {
         NetworkEvent.Context ctx = contextSupplier.get();
         ctx.enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();
-            if (mc.screen instanceof QteScreen) {
+            if (mc.screen instanceof QteScreen || mc.screen instanceof QteWordScreen) {
                 mc.setScreen(null);
             }
         });

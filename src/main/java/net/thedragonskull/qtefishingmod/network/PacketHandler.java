@@ -49,6 +49,18 @@ public class PacketHandler {
                 .decoder(S2CPlayFailSoundPacket::new)
                 .consumerMainThread(S2CPlayFailSoundPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(C2SQTEWordPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SQTEWordPacket::encode)
+                .decoder(C2SQTEWordPacket::new)
+                .consumerMainThread(C2SQTEWordPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(S2CQteUpdateWordPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CQteUpdateWordPacket::encode)
+                .decoder(S2CQteUpdateWordPacket::new)
+                .consumerMainThread(S2CQteUpdateWordPacket::handle)
+                .add();
     }
 
 

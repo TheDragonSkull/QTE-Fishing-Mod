@@ -72,9 +72,17 @@ public class FishingHookMixin implements IFishingHookQte {
                         ItemStack firstLoot = QteManager.generateFishingLoot(player, hook);
 
                         // Start Qte
-                        String randomChar = QteManager.getRandomQteChar();
-                        qte.startQte(player, randomChar, firstLoot);
-                        PacketHandler.sendToPlayer(new S2CQTEStartPacket(randomChar), player);
+                        String qteKey;
+                        if (QteManager.isHardModeEnabled()) {
+                            qteKey = QteManager.getRandomQteWord();
+                        } else {
+                            qteKey = QteManager.getRandomQteChar();
+                        }
+
+                        boolean isHard = QteManager.isHardModeEnabled();
+                        qteKey = isHard ? QteManager.getRandomQteWord() : QteManager.getRandomQteChar();
+                        qte.startQte(player, qteKey, firstLoot);
+                        PacketHandler.sendToPlayer(new S2CQTEStartPacket(qteKey, isHard), player);
                     }
                 }
             }
@@ -90,6 +98,9 @@ public class FishingHookMixin implements IFishingHookQte {
     @Unique private ItemStack qteLoot = ItemStack.EMPTY;
     @Unique private ServerPlayer qtePlayer;
     @Unique private long qteStartTime = 0L;
+
+    @Unique private String expectedWord;
+    @Unique private int currentWordIndex;
 
     @Override
     public int getQteSuccessCount() {
@@ -167,6 +178,34 @@ public class FishingHookMixin implements IFishingHookQte {
     @Override
     public ItemStack getQteLoot() {
         return qteLoot;
+    }
+
+
+    // words
+
+    @Override
+    public String getExpectedWord() {
+        return expectedWord;
+    }
+
+    @Override
+    public void setExpectedWord(String word) {
+        this.expectedWord = word;
+    }
+
+    @Override
+    public int getCurrentWordIndex() {
+        return currentWordIndex;
+    }
+
+    @Override
+    public void setCurrentWordIndex(int index) {
+        this.currentWordIndex = index;
+    }
+
+    @Override
+    public void incrementCurrentWordIndex() {
+        this.currentWordIndex++;
     }
 
 }

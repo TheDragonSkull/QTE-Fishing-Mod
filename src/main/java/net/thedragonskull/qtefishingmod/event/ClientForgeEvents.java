@@ -8,7 +8,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.thedragonskull.qtefishingmod.QteFishingMod;
 import net.thedragonskull.qtefishingmod.network.C2SQTEPacket;
+import net.thedragonskull.qtefishingmod.network.C2SQTEWordPacket;
 import net.thedragonskull.qtefishingmod.network.PacketHandler;
+import net.thedragonskull.qtefishingmod.util.QteManager;
 import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = QteFishingMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -23,7 +25,11 @@ public class ClientForgeEvents {
 
         if (keyString.matches("^[A-Z0-9]$")) {
             if (Minecraft.getInstance().getConnection() != null) {
-                PacketHandler.sendToServer(new C2SQTEPacket(keyString));
+                if (QteManager.isHardModeEnabled()) {
+                    PacketHandler.sendToServer(new C2SQTEWordPacket(keyString));
+                } else {
+                    PacketHandler.sendToServer(new C2SQTEPacket(keyString));
+                }
             }
         }
 
