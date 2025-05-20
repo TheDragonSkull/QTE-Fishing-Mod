@@ -33,12 +33,13 @@ public class QteWordScreen extends Screen {
         this.currentIndex = 0;
     }
 
-    public void setCurrentKey(String key) {
-        if (currentIndex < word.length() - 1) {
-            this.currentIndex++;
-        } else {
-            this.currentIndex = word.length();
-        }
+    public void setCurrentIndex(int index) {
+        this.currentIndex = index;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return true;
     }
 
     @Override
@@ -46,7 +47,6 @@ public class QteWordScreen extends Screen {
         String s = String.valueOf(codePoint).toUpperCase(Locale.ROOT);
 
         if (s.matches("^[A-Z0-9]$")) {
-            System.out.println(s);
             PacketHandler.sendToServer(new C2SQTEWordPacket(s));
             return true;
         }
@@ -75,7 +75,7 @@ public class QteWordScreen extends Screen {
 
         float scale = 3.0f;
         guiGraphics.pose().scale(scale, scale, 1.0f);
-        float xStart = (float) (midWidth / scale - (font.width(word) / 2));
+        float xStart = midWidth / scale - ((float) font.width(word) / 2);
 
         for (int i = 0; i < word.length(); i++) {
             String letter = String.valueOf(word.charAt(i));

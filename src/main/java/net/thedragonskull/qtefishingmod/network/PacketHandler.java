@@ -61,6 +61,12 @@ public class PacketHandler {
                 .decoder(S2CQteUpdateWordPacket::new)
                 .consumerMainThread(S2CQteUpdateWordPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(S2CQteProgressPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CQteProgressPacket::encode)
+                .decoder(S2CQteProgressPacket::new)
+                .consumerMainThread(S2CQteProgressPacket::handle)
+                .add();
     }
 
 

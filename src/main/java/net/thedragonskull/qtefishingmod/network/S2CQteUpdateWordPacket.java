@@ -30,7 +30,7 @@ public class S2CQteUpdateWordPacket {
 
             if (minecraft.screen instanceof QteWordScreen screen) {
                 screen.setFullWord(word);
-                screen.setCurrentKey(String.valueOf(word.charAt(0))); // empieza por la primera letra
+                //screen.setCurrentKey(String.valueOf(word.charAt(0))); // empieza por la primera letra
                 minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_PLING.get(), 1.0F, 1.5F));
             }
         });

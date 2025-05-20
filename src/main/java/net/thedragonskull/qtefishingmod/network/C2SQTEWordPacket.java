@@ -43,9 +43,12 @@ public class C2SQTEWordPacket {
                 if (qte.isQteActive()) {
                     String word = qte.getExpectedWord();
                     int index = qte.getCurrentWordIndex();
-                    System.out.println("qte word active");
+                    System.out.println("Fallo en la comparación:");
+                    System.out.println("word: " + word);
+                    System.out.println("index: " + index);
+                    System.out.println("key: " + this.key);
 
-                    if (index < word.length() && String.valueOf(word.charAt(index)).equalsIgnoreCase(this.key)) { // todo parece que falla aqui
+                    if (index < word.length() && String.valueOf(word.charAt(index)).equalsIgnoreCase(this.key)) {
                         qte.incrementCurrentWordIndex();
 
                         if (qte.getCurrentWordIndex() >= word.length()) {
@@ -75,11 +78,8 @@ public class C2SQTEWordPacket {
                         } else {
 
                             //Next QTE
-                            String randomWord = QteManager.getRandomQteWord();
-                            qte.setExpectedWord(randomWord);
-                            qte.setCurrentWordIndex(0);
                             qte.refreshQteTimer();
-                            PacketHandler.sendToPlayer(new S2CQteUpdateWordPacket(randomWord), player);
+                            PacketHandler.sendToPlayer(new S2CQteProgressPacket(qte.getCurrentWordIndex()), player);
                         }
                     } else {
 

@@ -149,6 +149,9 @@ public class FishingHookMixin implements IFishingHookQte {
         this.qteStartTime = player.serverLevel().getGameTime();
         this.expectedKey = key;
 
+        this.expectedWord = key;
+        this.currentWordIndex = 0;
+
         if (!this.qteActive) {
             this.qteActive = true;
             this.qteSuccessCount = 0;
