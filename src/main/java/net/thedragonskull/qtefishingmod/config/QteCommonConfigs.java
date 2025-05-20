@@ -31,7 +31,10 @@ public class QteCommonConfigs {
                 .define("hardMode", false);
 
         QTE_WORDS = BUILDER.comment("Words that can be used during QTE (separated by commas)")
-                .defineListAllowEmpty("Valid words", List.of("fish", "hook", "net", "river", "bait", "catch"),
+                .defineListAllowEmpty("Valid words", List.of(
+                        "fish", "hook", "net", "river", "bait", "catch",
+                                "rock", "wind", "cloud", "leaf", "mountain", "waterfall", "adventure", "wilderness", "camouflage",
+                                "exploration", "reflection", "navigation", "temperature", "observation"),
                         o -> o instanceof String && !((String) o).isBlank());
 
 
