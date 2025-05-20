@@ -2,11 +2,13 @@ package net.thedragonskull.qtefishingmod.mixin;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
@@ -53,6 +55,16 @@ public class FishingHookMixin implements IFishingHookQte {
             cir.setReturnValue(0);
         }
     }
+    @Inject(method = "catchingFish", at = @At("HEAD"), cancellable = true)
+    private void shinobimod$cancelFishIfQteActive(BlockPos pos, CallbackInfo ci) {
+        FishingHook hook = (FishingHook)(Object)this;
+        IFishingHookQte qte = (IFishingHookQte) hook;
+
+        if (qte.isQteActive()) {
+            ci.cancel();
+        }
+    }
+
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void onTick(CallbackInfo ci) {

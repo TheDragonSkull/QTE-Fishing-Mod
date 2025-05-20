@@ -67,6 +67,12 @@ public class PacketHandler {
                 .decoder(S2CQteProgressPacket::new)
                 .consumerMainThread(S2CQteProgressPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(S2CPlaySuccessSoundPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CPlaySuccessSoundPacket::encode)
+                .decoder(S2CPlaySuccessSoundPacket::new)
+                .consumerMainThread(S2CPlaySuccessSoundPacket::handle)
+                .add();
     }
 
 

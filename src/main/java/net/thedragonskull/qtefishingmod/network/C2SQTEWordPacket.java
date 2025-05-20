@@ -46,6 +46,7 @@ public class C2SQTEWordPacket {
 
                     if (index < word.length() && String.valueOf(word.charAt(index)).equalsIgnoreCase(this.key)) {
                         qte.incrementCurrentWordIndex();
+                        PacketHandler.sendToPlayer(new S2CPlaySuccessSoundPacket(), player);
 
                         if (qte.getCurrentWordIndex() >= word.length()) {
                             qte.incrementQteSuccessCount();

@@ -61,28 +61,41 @@ public class QteWordScreen extends Screen {
 
         guiGraphics.drawCenteredString(this.font, "¡Type the word!", midWidth, midHeight - 40, 0xFFFFFF);
 
-        RenderSystem.enableBlend();
+/*        RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
         int frameSize = 48;
         guiGraphics.blit(BASE, midWidth - frameSize / 2, midHeight - frameSize / 2, 0, 0, frameSize, frameSize, frameSize, frameSize);
 
-        RenderSystem.disableBlend();
+        RenderSystem.disableBlend();*/ // todo new frame?
 
         guiGraphics.pose().pushPose();
 
         float scale = 3.0f;
         guiGraphics.pose().scale(scale, scale, 1.0f);
         float xStart = midWidth / scale - ((float) font.width(word) / 2);
+        float yStart = midHeight / scale - (font.lineHeight / 2.0f);
 
         for (int i = 0; i < word.length(); i++) {
             String letter = String.valueOf(word.charAt(i));
-            int color = (i == currentIndex) ? 0xFF0000 : 0xFFFFFF;
-            guiGraphics.drawString(this.font, letter, (int) xStart, 0, color, false);
+            int color;
+
+            if (i < currentIndex) {
+                color = 0x00FF00; // Green
+            } else if (i == currentIndex) {
+                color = 0xFF0000; // Red
+            } else {
+                color = 0xFFFFFF; // White
+            }
+
+            guiGraphics.drawString(this.font, letter, Math.round(xStart + 0.5), Math.round(yStart + 1.5), color, false);
             xStart += font.width(letter);
         }
 
         guiGraphics.pose().popPose();
+
+        int underlineY = (int) yStart + font.lineHeight;
+        guiGraphics.drawString(this.font, "_", (int) xStart, underlineY, 0xAAAAAA, false);
 
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
