@@ -61,14 +61,6 @@ public class QteWordScreen extends Screen {
 
         guiGraphics.drawCenteredString(this.font, "¡Type the word!", midWidth, midHeight - 40, 0xFFFFFF);
 
-/*        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-
-        int frameSize = 48;
-        guiGraphics.blit(BASE, midWidth - frameSize / 2, midHeight - frameSize / 2, 0, 0, frameSize, frameSize, frameSize, frameSize);
-
-        RenderSystem.disableBlend();*/ // todo new frame?
-
         guiGraphics.pose().pushPose();
 
         float scale = 3.0f;
