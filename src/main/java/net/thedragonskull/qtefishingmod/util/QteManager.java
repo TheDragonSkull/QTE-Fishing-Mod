@@ -19,12 +19,15 @@ import net.thedragonskull.qtefishingmod.network.PacketHandler;
 import net.thedragonskull.qtefishingmod.network.S2CPlayFailSoundPacket;
 import net.thedragonskull.qtefishingmod.network.S2CQTEScreenClosePacket;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class QteManager {
     private static final String VALID_CHARS = QteCommonConfigs.VALID_CHARS.get();
-    private static final List<String> WORDS = List.of("fish", "hook", "net", "river", "bait", "catch"); //todo config
+    private static final Set<String> usedWords = new HashSet<>();
 
     private static final Random RANDOM = new Random();
 
@@ -34,7 +37,27 @@ public class QteManager {
     }
 
     public static String getRandomQteWord() {
-        return WORDS.get(RANDOM.nextInt(WORDS.size())).toUpperCase();
+        List<? extends String> words = QteCommonConfigs.QTE_WORDS.get();
+
+        if (words.isEmpty()) return "DEFAULT";
+
+        List<String> availableWords = words.stream()
+                .map(String::toUpperCase)
+                .filter(w -> !usedWords.contains(w))
+                .toList();
+
+        if (availableWords.isEmpty()) {
+            usedWords.clear();
+            return getRandomQteWord();
+        }
+
+        String selected = availableWords.get(RANDOM.nextInt(availableWords.size()));
+        usedWords.add(selected);
+        return selected;
+    }
+
+    public static void resetUsedWords() {
+        usedWords.clear();
     }
 
     public static void retrieveAndDamageRod(ServerPlayer player, FishingHook hook, int damage) {

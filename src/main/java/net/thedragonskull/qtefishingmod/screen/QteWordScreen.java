@@ -88,14 +88,18 @@ public class QteWordScreen extends Screen {
                 color = 0xFFFFFF; // White
             }
 
-            guiGraphics.drawString(this.font, letter, Math.round(xStart + 0.5), Math.round(yStart + 1.5), color, false);
+            int letterX = Math.round(xStart + 0.5f);
+            int letterY = Math.round(yStart + 1.5f);
+
+            guiGraphics.drawString(this.font, letter, letterX, letterY, color, false);
+
+            int underlineY = letterY + this.font.lineHeight - 7;
+            guiGraphics.drawString(this.font, "_", letterX, underlineY, 0xAAAAAA, false);
+
             xStart += font.width(letter);
         }
 
         guiGraphics.pose().popPose();
-
-        int underlineY = (int) yStart + font.lineHeight;
-        guiGraphics.drawString(this.font, "_", (int) xStart, underlineY, 0xAAAAAA, false);
 
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }

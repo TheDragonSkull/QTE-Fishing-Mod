@@ -29,8 +29,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Mixin(FishingHook.class)
 public class FishingHookMixin implements IFishingHookQte {
@@ -45,12 +47,14 @@ public class FishingHookMixin implements IFishingHookQte {
 
         if (qte.isQteActive()) {
             qte.cancelQte();
+            QteManager.resetUsedWords();
             hook.discard();
             cir.setReturnValue(0);
             return;
         }
 
         if (qte.isQteHandled()) {
+            QteManager.resetUsedWords();
             hook.discard();
             cir.setReturnValue(0);
         }

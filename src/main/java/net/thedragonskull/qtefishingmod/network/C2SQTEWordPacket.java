@@ -71,6 +71,7 @@ public class C2SQTEWordPacket {
                                 qte.setQteHandled(true);
                                 QteManager.retrieveAndDamageRod(player, hook, 2);
                                 qte.cancelQte();
+                                QteManager.resetUsedWords();
                                 PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
                             } else {
 
@@ -90,6 +91,7 @@ public class C2SQTEWordPacket {
                         qte.setQteHandled(true);
                         QteManager.retrieveAndDamageRod(player, hook, 1);
                         qte.cancelQte();
+                        QteManager.resetUsedWords();
                         PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
                         PacketHandler.sendToPlayer(new S2CPlayFailSoundPacket(), player);
                         player.level().playSound(null, hook.getX(), hook.getY(), hook.getZ(),
