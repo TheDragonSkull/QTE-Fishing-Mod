@@ -65,7 +65,18 @@ public class QteWordScreen extends Screen {
 
         float scale = 3.0f;
         guiGraphics.pose().scale(scale, scale, 1.0f);
-        float xStart = midWidth / scale - ((float) font.width(word) / 2);
+
+        float extraSpacing = 2.0f;
+        float totalWidth = 0;
+
+        for (int i = 0; i < word.length(); i++) {
+            totalWidth += font.width(String.valueOf(word.charAt(i)));
+            if (i != word.length() - 1) {
+                totalWidth += extraSpacing;
+            }
+        }
+
+        float xStart = midWidth / scale - totalWidth / 2.0f;
         float yStart = midHeight / scale - (font.lineHeight / 2.0f);
 
         for (int i = 0; i < word.length(); i++) {
@@ -73,11 +84,11 @@ public class QteWordScreen extends Screen {
             int color;
 
             if (i < currentIndex) {
-                color = 0x00FF00; // Green
+                color = 0x00FF00;
             } else if (i == currentIndex) {
-                color = 0xFF0000; // Red
+                color = 0xFF0000;
             } else {
-                color = 0xFFFFFF; // White
+                color = 0xFFFFFF;
             }
 
             int letterX = Math.round(xStart + 0.5f);
@@ -86,9 +97,13 @@ public class QteWordScreen extends Screen {
             guiGraphics.drawString(this.font, letter, letterX, letterY, color, false);
 
             int underlineY = letterY + this.font.lineHeight - 7;
-            guiGraphics.drawString(this.font, "_", letterX, underlineY, 0xAAAAAA, false);
+            int letterWidth = font.width(letter);
+            int underlineWidth = font.width("_");
+            int underlineX = letterX + (letterWidth - underlineWidth) / 2;
 
-            xStart += font.width(letter);
+            guiGraphics.drawString(this.font, "_", underlineX, underlineY, 0xAAAAAA, false);
+
+            xStart += letterWidth + extraSpacing;
         }
 
         guiGraphics.pose().popPose();
