@@ -1,6 +1,5 @@
 package net.thedragonskull.qtefishingmod.screen;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,7 +7,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.thedragonskull.qtefishingmod.QteFishingMod;
-import net.thedragonskull.qtefishingmod.network.C2SQTEPacket;
 import net.thedragonskull.qtefishingmod.network.C2SQTEWordPacket;
 import net.thedragonskull.qtefishingmod.network.PacketHandler;
 import org.lwjgl.glfw.GLFW;
@@ -28,7 +26,7 @@ public class QteWordScreen extends Screen {
         this.currentIndex = 0;
     }
 
-    public void setFullWord(String word) {
+    public void setNewWord(String word) {
         this.word = word;
         this.currentIndex = 0;
     }

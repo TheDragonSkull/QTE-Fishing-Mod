@@ -187,6 +187,13 @@ public class FishingHookMixin implements IFishingHookQte {
     // words
 
     @Override
+    public void generateNewWord() {
+        this.expectedWord = QteManager.getRandomQteWord();
+        this.currentWordIndex = 0;
+        this.refreshQteTimer();
+    }
+
+    @Override
     public String getExpectedWord() {
         return expectedWord;
     }

@@ -43,41 +43,43 @@ public class C2SQTEWordPacket {
                 if (qte.isQteActive()) {
                     String word = qte.getExpectedWord();
                     int index = qte.getCurrentWordIndex();
-                    System.out.println("Fallo en la comparación:");
-                    System.out.println("word: " + word);
-                    System.out.println("index: " + index);
-                    System.out.println("key: " + this.key);
 
                     if (index < word.length() && String.valueOf(word.charAt(index)).equalsIgnoreCase(this.key)) {
                         qte.incrementCurrentWordIndex();
 
                         if (qte.getCurrentWordIndex() >= word.length()) {
+                            qte.incrementQteSuccessCount();
 
-                            //Finish
-                            ServerLevel level = player.serverLevel();
-                            ItemStack loot = qte.getQteLoot();
-                            ItemEntity itemEntity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), loot.copy());
+                            if (qte.getQteSuccessCount() >= qte.getMaxQteSuccess()) {
+                                ServerLevel level = player.serverLevel();
+                                ItemStack loot = qte.getQteLoot();
+                                ItemEntity itemEntity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), loot.copy());
 
-                            double dx = player.getX() - hook.getX();
-                            double dy = player.getY() - hook.getY();
-                            double dz = player.getZ() - hook.getZ();
-                            itemEntity.setDeltaMovement(dx * 0.1D, dy * 0.1D + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08D, dz * 0.1D);
+                                double dx = player.getX() - hook.getX();
+                                double dy = player.getY() - hook.getY();
+                                double dz = player.getZ() - hook.getZ();
+                                itemEntity.setDeltaMovement(dx * 0.1D, dy * 0.1D + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08D, dz * 0.1D);
 
-                            level.addFreshEntity(itemEntity);
-                            level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, level.random.nextInt(6) + 1));
+                                level.addFreshEntity(itemEntity);
+                                level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, level.random.nextInt(6) + 1));
 
-                            if (loot.is(ItemTags.FISHES)) {
-                                player.awardStat(Stats.FISH_CAUGHT, 1);
+                                if (loot.is(ItemTags.FISHES)) {
+                                    player.awardStat(Stats.FISH_CAUGHT, 1);
+                                }
+
+                                qte.setQteHandled(true);
+                                QteManager.retrieveAndDamageRod(player, hook, 2);
+                                qte.cancelQte();
+                                PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
+                            } else {
+
+                                qte.generateNewWord();
+                                qte.refreshQteTimer();
+                                PacketHandler.sendToPlayer(new S2CQteUpdateWordPacket(qte.getExpectedWord()), player);
                             }
-
-                            qte.setQteHandled(true);
-                            QteManager.retrieveAndDamageRod(player, hook, 2);
-                            qte.cancelQte();
-                            PacketHandler.sendToPlayer(new S2CQTEScreenClosePacket(), player);
 
                         } else {
 
-                            //Next QTE
                             qte.refreshQteTimer();
                             PacketHandler.sendToPlayer(new S2CQteProgressPacket(qte.getCurrentWordIndex()), player);
                         }

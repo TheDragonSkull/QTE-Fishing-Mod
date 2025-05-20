@@ -42,5 +42,7 @@ public interface IFishingHookQte {
 
     void incrementCurrentWordIndex();
 
+    void generateNewWord();
+
 }
 
