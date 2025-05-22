@@ -3,6 +3,9 @@
 [![CurseForge Versions](https://cf.way2muchnoise.eu/versions/1269089.svg)](https://www.curseforge.com/minecraft/mc-mods/thedragons-mini-qte-fishing)
 [![CurseForge Downloads](https://cf.way2muchnoise.eu/short_1269089_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/thedragons-mini-qte-fishing)  
 
+[![Modrinth Versions](https://img.shields.io/modrinth/game-versions/J57LBG6X?label=Avaliable%20for&color=82ff80)](https://modrinth.com/mod/thedragons-mini-qte-fishing) 
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/J57LBG6X?logo=modrinth&color=82ff80)](https://modrinth.com/mod/thedragons-mini-qte-fishing)
+
 ---
 
 📖 About:
