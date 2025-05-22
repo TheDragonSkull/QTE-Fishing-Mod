@@ -82,7 +82,6 @@ public class C2SQTEWordPacket {
 
                         } else {
 
-                            qte.refreshQteTimer();
                             PacketHandler.sendToPlayer(new S2CQteProgressPacket(qte.getCurrentWordIndex()), player);
                         }
                     } else {
